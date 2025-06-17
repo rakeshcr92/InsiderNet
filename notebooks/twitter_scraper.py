@@ -9,8 +9,19 @@ try:
 except ImportError:
     raise ImportError("snscrape is required to run this script. Install via `pip install snscrape`. ")
 
-# Default search queries: stock tickers and CEO names
-QUERIES = ["AAPL", "TSLA", "GOOGL", "Elon Musk", "Satya Nadella"]
+# Broad finance-related search queries to surface trending stocks
+QUERIES = [
+    "stocks to watch",
+    "market movers",
+    "hot stocks",
+    "trending stocks",
+    "earnings report",
+    "stock analysis",
+    "bullish",
+    "bearish",
+    "upgraded stock",
+    "downgraded stock",
+]
 
 
 def fetch_tweets(queries, max_tweets=100):
