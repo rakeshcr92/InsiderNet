@@ -6,11 +6,19 @@ from pathlib import Path
 
 try:
     import snscrape.modules.twitter as sntwitter
-except ImportError:
-    raise ImportError("snscrape is required to run this script. Install via `pip install snscrape`. ")
+except (ModuleNotFoundError, AttributeError) as e:
+    raise ImportError(
+        "snscrape is required and may not be compatible with Python 3.12. "
+        "Install or upgrade via `pip install -U snscrape` and consider using Python 3.11 if issues persist."
+    ) from e
 
-# Broad finance-related search queries to surface trending stocks
-QUERIES = [
+
+# Sample tickers and CEO names to search for. Extend as needed.
+TICKERS = ["AAPL", "MSFT", "AMZN"]
+CEO_NAMES = ["Tim Cook", "Satya Nadella", "Andy Jassy"]
+
+# Broad finance-related search terms to surface trending stocks
+BASE_QUERIES = [
     "stocks to watch",
     "market movers",
     "hot stocks",
@@ -22,6 +30,12 @@ QUERIES = [
     "upgraded stock",
     "downgraded stock",
 ]
+
+
+def build_queries():
+    """Combine tickers, CEO names, and base finance queries."""
+    ticker_queries = [f"${t}" for t in TICKERS]
+    return ticker_queries + CEO_NAMES + BASE_QUERIES
 
 
 def fetch_tweets(queries, max_tweets=100):
@@ -59,7 +73,8 @@ def save_csv(data, path):
 
 
 def main():
-    tweets = fetch_tweets(QUERIES, max_tweets=100)
+    queries = build_queries()
+    tweets = fetch_tweets(queries, max_tweets=100)
 
     root_dir = Path(__file__).resolve().parents[1]
     today = datetime.utcnow().strftime("%Y-%m-%d")
