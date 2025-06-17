@@ -6,7 +6,7 @@ Data collected by the scripts is stored by date under the `data/` folder.  Each 
 
 ## Requirements
 - Python 3.11 or compatible
-- [`snscrape`](https://github.com/JustAnotherArchivist/snscrape)
+- [`tweepy`](https://www.tweepy.org/)
 - [`praw`](https://praw.readthedocs.io/en/latest/)
 
-`snscrape` has limited support for Python 3.12.  If you see an import error, upgrade the package (`pip install -U snscrape`) or run the script with Python 3.11.
+Set the `TWITTER_BEARER_TOKEN` environment variable as well as the Reddit API credentials before running the scripts.

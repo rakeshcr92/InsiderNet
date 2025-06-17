@@ -5,12 +5,10 @@ from datetime import datetime
 from pathlib import Path
 
 try:
-    import snscrape.modules.twitter as sntwitter
-    from snscrape.base import ScraperException
-except (ModuleNotFoundError, AttributeError) as e:
+    import tweepy
+except ImportError as e:
     raise ImportError(
-        "snscrape is required and may not be compatible with Python 3.12. "
-        "Install or upgrade via `pip install -U snscrape` and consider using Python 3.11 if issues persist."
+        "tweepy is required to run this script. Install via `pip install tweepy`."
     ) from e
 
 
@@ -39,24 +37,35 @@ def build_queries():
     return ticker_queries + CEO_NAMES + BASE_QUERIES
 
 
-def fetch_tweets(queries, max_tweets=100):
-    """Fetch tweets for each query using snscrape."""
+def get_twitter_client():
+    """Return a Tweepy client using the bearer token from the environment."""
+    token = os.getenv("TWITTER_BEARER_TOKEN")
+    if not token:
+        raise RuntimeError("TWITTER_BEARER_TOKEN environment variable is required")
+    return tweepy.Client(bearer_token=token, wait_on_rate_limit=True)
+
+
+def fetch_tweets(client, queries, max_tweets=100):
+    """Fetch tweets for each query using the Twitter API."""
     tweets = []
     for query in queries:
-        scraper = sntwitter.TwitterSearchScraper(query)
         try:
-            for i, tweet in enumerate(scraper.get_items()):
-                if i >= max_tweets:
-                    break
+            paginator = tweepy.Paginator(
+                client.search_recent_tweets,
+                query=query,
+                tweet_fields=["public_metrics", "created_at", "author_id"],
+                max_results=100,
+            )
+            for i, tweet in enumerate(paginator.flatten(limit=max_tweets)):
                 tweets.append({
                     "query": query,
                     "id": tweet.id,
-                    "content": tweet.content,
-                    "retweet_count": tweet.retweetCount,
-                    "date": tweet.date.isoformat(),
-                    "user_id": tweet.user.id,
+                    "content": tweet.text,
+                    "retweet_count": tweet.public_metrics.get("retweet_count", 0),
+                    "date": tweet.created_at.isoformat(),
+                    "user_id": tweet.author_id,
                 })
-        except ScraperException as e:
+        except tweepy.TweepyException as e:
             print(f"Error fetching tweets for '{query}': {e}")
     return tweets
 
@@ -78,7 +87,8 @@ def save_csv(data, path):
 
 def main():
     queries = build_queries()
-    tweets = fetch_tweets(queries, max_tweets=100)
+    client = get_twitter_client()
+    tweets = fetch_tweets(client, queries, max_tweets=100)
 
     root_dir = Path(__file__).resolve().parents[1]
     today = datetime.utcnow().strftime("%Y-%m-%d")
