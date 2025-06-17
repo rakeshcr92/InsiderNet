@@ -6,6 +6,7 @@ from pathlib import Path
 
 try:
     import snscrape.modules.twitter as sntwitter
+    from snscrape.base import ScraperException
 except (ModuleNotFoundError, AttributeError) as e:
     raise ImportError(
         "snscrape is required and may not be compatible with Python 3.12. "
@@ -43,17 +44,20 @@ def fetch_tweets(queries, max_tweets=100):
     tweets = []
     for query in queries:
         scraper = sntwitter.TwitterSearchScraper(query)
-        for i, tweet in enumerate(scraper.get_items()):
-            if i >= max_tweets:
-                break
-            tweets.append({
-                "query": query,
-                "id": tweet.id,
-                "content": tweet.content,
-                "retweet_count": tweet.retweetCount,
-                "date": tweet.date.isoformat(),
-                "user_id": tweet.user.id,
-            })
+        try:
+            for i, tweet in enumerate(scraper.get_items()):
+                if i >= max_tweets:
+                    break
+                tweets.append({
+                    "query": query,
+                    "id": tweet.id,
+                    "content": tweet.content,
+                    "retweet_count": tweet.retweetCount,
+                    "date": tweet.date.isoformat(),
+                    "user_id": tweet.user.id,
+                })
+        except ScraperException as e:
+            print(f"Error fetching tweets for '{query}': {e}")
     return tweets
 
 
