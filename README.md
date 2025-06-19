@@ -1,6 +1,6 @@
 # InsiderNet
 
-This project contains example scripts for scraping public finance data from Twitter/X, Reddit, and the SEC EDGAR feed.  See the `notebooks/` directory for runnable scripts.
+This project contains example scripts for scraping public finance data from Twitter/X, Reddit, the SEC EDGAR feed, and Google Trends.  See the `notebooks/` directory for runnable scripts.
 
 Data collected by the scripts is stored by date under the `data/` folder.  Each run outputs timestamped JSON and CSV files for reproducibility.
 
@@ -9,5 +9,6 @@ Data collected by the scripts is stored by date under the `data/` folder.  Each 
 - [`tweepy`](https://www.tweepy.org/)
 - [`praw`](https://praw.readthedocs.io/en/latest/)
 - [`feedparser`](https://pypi.org/project/feedparser/), `requests`, `beautifulsoup4`
+- [`pytrends`](https://github.com/GeneralMills/pytrends)
 
 Set the `TWITTER_BEARER_TOKEN` environment variable as well as the Reddit API credentials before running the scripts.
