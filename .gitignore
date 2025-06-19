@@ -1,0 +1,9 @@
+# Ignore Python cache and compiled files
+__pycache__/
+*.py[cod]
+
+# Ignore data outputs but keep README files
+/data/*
+!/data/README.md
+
+/notebooks/__pycache__/
