@@ -4,7 +4,7 @@ This project contains example scripts for scraping public finance data from Twit
 
 Data collected by the scripts is stored by date under the `data/` folder.  Each run outputs timestamped JSON and CSV files for reproducibility.
 
-The `webapp/` directory includes a small Flask application with a Tailwind front end. It accepts a ticker symbol, expands Reddit search keywords using OpenAI, gathers data from Reddit, the SEC, Google Trends and Yahoo Finance, and saves a labeled price dataset.
+The `webapp/` directory includes a small Flask application with a Tailwind front end. It accepts a ticker symbol, expands Reddit search keywords using OpenAI, gathers data from Reddit, the SEC, Google Trends and Yahoo Finance, and saves both raw prices and labeled datasets. Labels are generated using the realtime `labels.py` logic as well as `labels_from_prices.py` on the stored prices.
 
 ## Requirements
 - Python 3.11 or compatible

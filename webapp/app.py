@@ -16,7 +16,14 @@ except ImportError as e:  # pragma: no cover - handled at runtime
         "openai is required to run this app. Install via `pip install openai`."
     ) from e
 
-from notebooks import labels, google_trends, historical_prices, reddit_scraper, sec_edgar_scraper
+from notebooks import (
+    labels,
+    labels_from_prices,
+    google_trends,
+    historical_prices,
+    reddit_scraper,
+    sec_edgar_scraper,
+)
 
 app = Flask(__name__)
 
@@ -94,6 +101,7 @@ def track():
     filings = sec_edgar_scraper.parse_entries(ticker)
     labels_data = labels.fetch_price_history(ticker)
     labels_data = labels.add_labels(labels_data)
+    price_records = historical_prices.fetch_prices(ticker)
 
     root = Path(__file__).resolve().parents[1]
     today = datetime.utcnow().strftime("%Y-%m-%d")
@@ -106,6 +114,14 @@ def track():
     save_json(trends, out_dir / f"trends_{timestamp}.json")
     save_json(filings, out_dir / f"edgar_{timestamp}.json")
     save_json(labels_data, out_dir / f"labels_{timestamp}.json")
+    save_json(price_records, out_dir / f"prices_{timestamp}.json")
+    save_csv(price_records, out_dir / f"prices_{timestamp}.csv")
+
+    prices_csv = out_dir / f"prices_{timestamp}.csv"
+    try:
+        labels_from_prices.create_labels(prices_csv, root / "data")
+    except Exception as exc:  # noqa: BLE001
+        print(f"labels_from_prices error: {exc}")
 
     return render_template("index.html", message=f"Data collected for {ticker}")
 
