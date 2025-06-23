@@ -17,3 +17,5 @@ The `webapp/` directory includes a small Flask application with a Tailwind front
 - [`flask`](https://flask.palletsprojects.com/) for the optional web front end
 
 Set the `TWITTER_BEARER_TOKEN` environment variable as well as the Reddit API credentials before running the scripts.
+
+The `labels_from_prices.py` script generates future price-change labels using price data collected by `historical_prices.py`.
